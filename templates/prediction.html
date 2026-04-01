@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="prediction-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="prediction-header text-center mb-5" data-aos="fade-down">
+                    <h1 class="page-title">Skin Disease Prediction</h1>
+                    <p class="page-subtitle">Upload an image of the affected skin area for AI-powered analysis</p>
+                </div>
+
+                <div class="upload-container" data-aos="fade-up">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h4>Drag & Drop your image here</h4>
+                            <p class="text-muted">or</p>
+                            <label for="fileInput" class="btn btn-primary">
+                                <i class="fas fa-folder-open me-2"></i>Browse Files
+                            </label>
+                            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                            <p class="upload-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Supported formats: JPG, JPEG, PNG (Max 16MB)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="preview-container" id="previewContainer" style="display: none;">
+                        <div class="image-preview">
+                            <img id="imagePreview" src="" alt="Preview">
+                            <button class="btn btn-sm btn-danger remove-btn" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="image-details mt-3">
+                            <p><strong>Filename:</strong> <span id="fileName"></span></p>
+                            <p><strong>Size:</strong> <span id="fileSize"></span></p>
+                        </div>
+                        <button class="btn btn-success btn-lg w-100 mt-3" id="predictBtn">
+                            <i class="fas fa-microscope me-2"></i>Analyze Image
+                        </button>
+                    </div>
+
+                    <div class="loading-container" id="loadingContainer" style="display: none;">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <h4 class="mt-4">Analyzing Image...</h4>
+                            <p class="text-muted">Please wait while our AI processes your image</p>
+                            <div class="progress mt-3" style="height: 8px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                    style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guidelines-section mt-5" data-aos="fade-up">
+                    <h5 class="mb-3">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>
+                        Image Guidelines for Best Results
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="guideline-card good">
+                                <i class="fas fa-check-circle"></i>
+                                <h6>Do's</h6>
+                                <ul>
+                                    <li>Use good lighting</li>
+                                    <li>Capture close-up shots</li>
+                                    <li>Keep image in focus</li>
+                                    <li>Use plain background</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="guideline-card bad">
+                                <i class="fas fa-times-circle"></i>
+                                <h6>Don'ts</h6>
+                                <ul>
+                                    <li>Avoid blurry images</li>
+                                    <li>Don't use filters</li>
+                                    <li>Avoid shadows</li>
+                                    <li>Don't crop too much</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="errorToast" class="toast" role="alert">
+        <div class="toast-header bg-danger text-white">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeImage = document.getElementById('removeImage');
+    const predictBtn = document.getElementById('predictBtn');
+    const loadingContainer = document.getElementById('loadingContainer');
+    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+
+    let selectedFile = null;
+
+    // Drag and drop handlers
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('drag-over');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+            showError('Please upload an image file');
+            return;
+        }
+
+        if (file.size > 16 * 1024 * 1024) {
+            showError('File size must be less than 16MB');
+            return;
+        }
+
+        selectedFile = file;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+            uploadArea.style.display = 'none';
+            previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    removeImage.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        previewContainer.style.display = 'none';
+        uploadArea.style.display = 'block';
+    });
+
+    predictBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        previewContainer.style.display = 'none';
+        loadingContainer.style.display = 'block';
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                showError(data.error || 'Prediction failed');
+                loadingContainer.style.display = 'none';
+                previewContainer.style.display = 'block';
+            }
+        } catch (error) {
+            showError('Network error. Please try again.');
+            loadingContainer.style.display = 'none';
+            previewContainer.style.display = 'block';
+        }
+    });
+
+    function showError(message) {
+        document.querySelector('#errorToast .toast-body').textContent = message;
+        errorToast.show();
+    }
+</script>
+{% endblock %}

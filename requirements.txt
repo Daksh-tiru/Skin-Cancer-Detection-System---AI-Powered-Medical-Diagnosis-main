@@ -1,0 +1,1 @@
+py -3.11 -m venv venv && venv\Scripts\activate && python -m pip install Flask==3.0.0 tensorflow==2.18.0 numpy==1.26.4 Pillow==10.1.0 werkzeug==3.0.1

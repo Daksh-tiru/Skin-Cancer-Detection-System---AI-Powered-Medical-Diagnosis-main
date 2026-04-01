@@ -1,0 +1,314 @@
+import os
+
+# Ensure templates directory exists
+os.makedirs('templates', exist_ok=True)
+
+# Complete HTML content with proper encoding
+html_content = '''{% extends 'base.html' %}
+
+{% block content %}
+<section class="result-section">
+    <div class="container">
+        {% if no_result %}
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="no-result-card" data-aos="fade-up">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>No Results Available</h3>
+                    <p>Please upload an image first to get prediction results</p>
+                    <a href="{{ url_for('prediction') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-upload me-2"></i>Upload Image
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="result-header text-center mb-5" data-aos="fade-down">
+            <span class="badge badge-success mb-3">
+                <i class="fas fa-check-circle me-2"></i>Analysis Complete
+            </span>
+            <h1 class="page-title">Diagnosis Results</h1>
+            <p class="text-muted">{{ result.timestamp }}</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5" data-aos="fade-right">
+                <div class="result-card image-card">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-image me-2"></i>Uploaded Image
+                    </h5>
+                    <div class="uploaded-image">
+                        <img src="{{ result.image_path }}" alt="Uploaded skin image">
+                    </div>
+                </div>
+
+                <div class="result-card prediction-card mt-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-diagnoses me-2"></i>Primary Diagnosis
+                    </h5>
+                    <div class="prediction-result">
+                        <div class="disease-name">{{ result.predicted_class }}</div>
+                        <div class="confidence-badge">
+                            <span class="confidence-label">Confidence:</span>
+                            <span class="confidence-value">{{ "%.2f"|format(result.confidence) }}%</span>
+                        </div>
+                        <div class="confidence-bar mt-3">
+                            <div class="confidence-fill" style="width: {{ result.confidence }}%"></div>
+                        </div>
+                        
+                        {% set severity = result.disease_info.severity %}
+                        <div class="severity-badge severity-{{ severity.lower() }} mt-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Severity: {{ severity }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7" data-aos="fade-left">
+                <div class="result-card chart-card mb-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-bar me-2"></i>Probability Distribution
+                    </h5>
+                    <div style="height: 320px; position: relative;">
+                        <''' + '''canvas id="chartBar"></''' + '''canvas>
+                    </div>
+                </div>
+
+                <div class="result-card chart-card">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-pie me-2"></i>Top 5 Predictions
+                    </h5>
+                    <div style="height: 320px; position: relative;">
+                        <''' + '''canvas id="chartPie"></''' + '''canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12" data-aos="fade-up">
+                <div class="result-card info-card">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Disease Information
+                    </h5>
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="info-heading">
+                                <i class="fas fa-file-medical me-2 text-primary"></i>Description
+                            </h6>
+                            <p class="info-text">{{ result.disease_info.description }}</p>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="info-heading">
+                                <i class="fas fa-stethoscope me-2 text-danger"></i>Common Symptoms
+                            </h6>
+                            <ul class="symptoms-list">
+                                {% for symptom in result.disease_info.symptoms %}
+                                <li>{{ symptom }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="info-heading">
+                                <i class="fas fa-pills me-2 text-success"></i>Treatment Options
+                            </h6>
+                            <p class="info-text">{{ result.disease_info.treatment }}</p>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="info-heading">
+                                <i class="fas fa-shield-alt me-2 text-warning"></i>Prevention
+                            </h6>
+                            <p class="info-text">{{ result.disease_info.prevention }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12" data-aos="fade-up">
+                <div class="disclaimer-card">
+                    <div class="disclaimer-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="disclaimer-content">
+                        <h6>Medical Disclaimer</h6>
+                        <p>This AI-based diagnosis is for informational purposes only and should not replace professional medical advice. Please consult a qualified dermatologist or healthcare provider for proper diagnosis and treatment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 mb-5">
+            <div class="col-12 text-center" data-aos="fade-up">
+                <a href="{{ url_for('prediction') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-redo me-2"></i>Analyze Another Image
+                </a>
+                <button class="btn btn-outline-primary btn-lg" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Print Results
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{% if result %}
+<script>
+var chartData = {{ result.top_predictions | tojson | safe }};
+var chartLabels = [];
+var chartValues = [];
+
+for (var i = 0; i < chartData.length; i++) {
+    chartLabels.push(chartData[i].class);
+    chartValues.push(chartData[i].probability);
+}
+
+var chartColors = [
+    'rgba(102, 126, 234, 0.8)',
+    'rgba(118, 75, 162, 0.8)',
+    'rgba(237, 100, 166, 0.8)',
+    'rgba(255, 154, 158, 0.8)',
+    'rgba(250, 208, 196, 0.8)',
+    'rgba(72, 187, 120, 0.8)',
+    'rgba(56, 178, 172, 0.8)'
+];
+
+var chartBorders = [
+    'rgb(102, 126, 234)',
+    'rgb(118, 75, 162)',
+    'rgb(237, 100, 166)',
+    'rgb(255, 154, 158)',
+    'rgb(250, 208, 196)',
+    'rgb(72, 187, 120)',
+    'rgb(56, 178, 172)'
+];
+
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        var ctx1 = document.getElementById('chartBar');
+        var ctx2 = document.getElementById('chartPie');
+        
+        if (ctx1 && typeof Chart !== 'undefined') {
+            new Chart(ctx1.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Confidence',
+                        data: chartValues,
+                        backgroundColor: chartColors,
+                        borderColor: chartBorders,
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Confidence: ' + context.parsed.y.toFixed(2) + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        if (ctx2 && typeof Chart !== 'undefined') {
+            new Chart(ctx2.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        data: chartValues,
+                        backgroundColor: chartColors,
+                        borderColor: '#0f172a',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#94a3b8',
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed.toFixed(2) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }, 500);
+});
+</script>
+{% endif %}
+{% endblock %}
+'''
+
+# Write file with UTF-8 encoding
+file_path = 'templates/result.html'
+try:
+    with open(file_path, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(html_content)
+    print(f"✓ Successfully created {file_path}")
+    print(f"✓ File size: {os.path.getsize(file_path)} bytes")
+    
+    # Verify the file
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        if 'canvas' in content:
+            print("✓ File verified: 'canvas' tags are correct")
+        else:
+            print("✗ Warning: 'canvas' tag not found in file")
+            
+except Exception as e:
+    print(f"✗ Error creating file: {e}")

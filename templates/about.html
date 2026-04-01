@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- About Hero -->
+<section class="about-hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <span class="badge-custom mb-3">About Our Project</span>
+                <h1 class="about-title">Revolutionizing Skin Cancer Detection with AI</h1>
+                <p class="about-text">
+                    SkinCare AI is an advanced deep learning system that leverages Convolutional Neural Networks (CNN)
+                    to detect and classify 24 different types of skin diseases with over 95% accuracy.
+                </p>
+                <div class="about-stats mt-4">
+                    <div class="stat-box">
+                        <h3>50,000+</h3>
+                        <p>Training Images</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>95%+</h3>
+                        <p>Accuracy Rate</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>24</h3>
+                        <p>Disease Classes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="about-illustration">
+                    <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="50" y="50" width="500" height="300" rx="20" fill="url(#grad1)" opacity="0.1" />
+                        <rect x="70" y="70" width="460" height="260" rx="15" fill="url(#grad1)" opacity="0.2" />
+                        ircle cx="300" cy="200" r="80" fill="url(#grad1)" opacity="0.6"/>
+                        <path d="M 250 200 L 280 230 L 350 160" stroke="#ffffff" stroke-width="8" fill="none"
+                            stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technology Section -->
+<section class="technology-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-subtitle">Our Technology</span>
+            <h2 class="section-title">Powered by Deep Learning</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h5>CNN Architecture</h5>
+                    <p>Multi-layer convolutional neural network with 4 conv blocks, batch normalization, and dropout
+                        layers</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h5>Dataset</h5>
+                    <p>Trained on 50,000+ dermatology images across 24 different skin conditions and diseases</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <i class="fab fa-python"></i>
+                    </div>
+                    <h5>TensorFlow & Keras</h5>
+                    <p>Built using industry-standard deep learning frameworks for reliable and accurate predictions</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5>Data Augmentation</h5>
+                    <p>Advanced preprocessing with rotation, flip, zoom, and brightness adjustments for robustness</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Model Architecture -->
+<section class="architecture-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-subtitle">Technical Details</span>
+            <h2 class="section-title">Model Architecture</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-10" data-aos="fade-up">
+                <div class="architecture-card">
+                    <div class="architecture-flow">
+                        <div class="flow-item">
+                            <div class="flow-icon input">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <h6>Input Layer</h6>
+                            <p>150x150x3</p>
+                        </div>
+                        <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                        <div class="flow-item">
+                            <div class="flow-icon conv">
+                                <i class="fas fa-th"></i>
+                            </div>
+                            <h6>Conv Blocks</h6>
+                            <p>4 Blocks (32-64-128-256)</p>
+                        </div>
+                        <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                        <div class="flow-item">
+                            <div class="flow-icon dense">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                            <h6>Dense Layers</h6>
+                            <p>512 → 256 neurons</p>
+                        </div>
+                        <div class="flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                        <div class="flow-item">
+                            <div class="flow-icon output">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h6>Output Layer</h6>
+                            <p>24 Classes (Softmax)</p>
+                        </div>
+                    </div>
+                    <div class="architecture-details mt-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-cog me-2 text-primary"></i>Training Details</h6>
+                                <ul class="details-list">
+                                    <li><strong>Optimizer:</strong> Adam (lr=0.0001)</li>
+                                    <li><strong>Loss Function:</strong> Categorical Crossentropy</li>
+                                    <li><strong>Batch Size:</strong> 16</li>
+                                    <li><strong>Epochs:</strong> 50 (with early stopping)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-shield-alt me-2 text-success"></i>Regularization</h6>
+                                <ul class="details-list">
+                                    <li><strong>Dropout:</strong> 0.25 - 0.5</li>
+                                    <li><strong>Batch Normalization:</strong> Yes</li>
+                                    <li><strong>L2 Regularization:</strong> 0.001</li>
+                                    <li><strong>Data Augmentation:</strong> Extensive</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Disease Coverage -->
+<section class="diseases-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-subtitle">Disease Coverage</span>
+            <h2 class="section-title">24 Detectable Conditions</h2>
+            <p class="section-description">Our model can accurately identify the following skin conditions</p>
+        </div>
+        <div class="row g-3">
+            {% set diseases = [
+            'Melanoma', 'Basal Cell Carcinoma', 'Squamous Cell Carcinoma', 'Actinic Keratosis',
+            'Benign Tumors', 'Acne', 'Eczema', 'Psoriasis', 'Rosacea', 'Vitiligo',
+            'Warts', 'Moles', 'Lichen', 'Lupus', 'Bullous', 'Candidiasis',
+            'Drug Eruption', 'Infestations Bites', 'Seborrheic Keratoses', 'Sun Damage',
+            'Tinea', 'Vascular Tumors', 'Vasculitis', 'Normal Skin'
+            ] %}
+            {% for disease in diseases %}
+            <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 20 }}">
+                <div class="disease-badge">
+                    <i class="fas fa-check-circle me-2"></i>{{ disease }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-subtitle">Our Mission</span>
+            <h2 class="section-title">Early Detection Saves Lives</h2>
+            <p class="section-description">
+                We're committed to making skin cancer detection accessible to everyone through AI technology
+            </p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4 col-md-6" data-aos="zoom-in">
+                <div class="mission-card">
+                    <div class="mission-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h5>Our Mission</h5>
+                    <p>To provide accessible, accurate, and instant skin disease detection to improve early diagnosis
+                        and treatment outcomes</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="mission-card">
+                    <div class="mission-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h5>Our Vision</h5>
+                    <p>A world where everyone has access to AI-powered medical diagnosis tools for preventive healthcare
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="mission-card">
+                    <div class="mission-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h5>Our Values</h5>
+                    <p>Accuracy, accessibility, privacy, and continuous improvement through research and development</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="about-cta-section py-5">
+    <div class="container">
+        <div class="cta-box" data-aos="zoom-in">
+            <h2>Ready to Try Our AI Detection System?</h2>
+            <p>Upload your image and get instant analysis in seconds</p>
+            <a href="{{ url_for('prediction') }}" class="btn btn-light btn-lg mt-3">
+                <i class="fas fa-microscope me-2"></i>Start Detection
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
