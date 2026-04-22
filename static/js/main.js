@@ -171,4 +171,4 @@ createParticles();
 // ========================================
 console.log('%c🔬 SkinCare AI Detection System', 'color: #667eea; font-size: 20px; font-weight: bold;');
 console.log('%cBuilt with ❤️ using Flask, TensorFlow & Modern Web Technologies', 'color: #94a3b8; font-size: 12px;');
-console.log('%cDeveloped by: CodeAJ', 'color: #764ba2; font-size: 14px;');
+console.log('%cDeveloped by: Daksh Bhardwaj', 'color: #764ba2; font-size: 14px;');

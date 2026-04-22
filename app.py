@@ -17,7 +17,7 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 MODELS_FOLDER = os.path.join(BASE_DIR, 'models')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-IMAGE_SIZE = (150, 150)
+IMAGE_SIZE = (224, 224)
 
 MODEL_PATH = os.path.join(MODELS_FOLDER, 'skin_cancer_best.keras')
 LABELS_PATH = os.path.join(MODELS_FOLDER, 'class_labels.npy')
@@ -65,7 +65,7 @@ def preprocess_image(img_path):
     img = img.resize(IMAGE_SIZE)
     img_array = np.array(img, dtype=np.float32)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0
+    # EfficientNet naturally expects input in the [0, 255] range, no scaling needed
     return img_array
 
 
@@ -73,23 +73,30 @@ def get_disease_info(disease_name):
     info = {
         'melanoma': {
             'severity': 'High',
-            'description': 'A serious form of skin cancer.',
-            'symptoms': ['Asymmetrical moles', 'Irregular borders', 'Color variation'],
-            'treatment': 'Consult a dermatologist immediately for further evaluation and treatment.',
+            'description': 'A serious form of skin cancer that begins in melanocytes.',
+            'symptoms': ['Asymmetrical moles', 'Irregular borders', 'Color variation', 'Evolving size'],
+            'treatment': 'Consult a dermatologist immediately for biopsy and possible excision.',
             'prevention': 'Use sunscreen, avoid UV exposure, and do regular skin checks.'
         },
         'basal_cell_carcinoma': {
             'severity': 'Medium',
             'description': 'A common and usually treatable type of skin cancer.',
-            'symptoms': ['Pearly bump', 'Flat lesion', 'Bleeding sore'],
-            'treatment': 'Usually treated with minor surgical or dermatological procedures.',
+            'symptoms': ['Pearly bump', 'Flat flesh-colored lesion', 'Bleeding sore that heals and returns'],
+            'treatment': 'Minor surgical or dermatological procedures.',
             'prevention': 'Sun protection and regular skin monitoring.'
+        },
+        'squamous_cell_carcinoma': {
+            'severity': 'Medium to High',
+            'description': 'A common form of skin cancer that develops in the squamous cells.',
+            'symptoms': ['Firm, red nodule', 'Flat sore with a scaly crust'],
+            'treatment': 'Surgical excision, Mohs surgery, or radiation therapy. Consult a doctor.',
+            'prevention': 'Limit sun exposure, wear protective clothing, use broad-spectrum sunscreen.'
         },
         'Acne': {
             'severity': 'Low',
             'description': 'A common skin condition that causes pimples and inflammation.',
-            'symptoms': ['Whiteheads', 'Blackheads', 'Pimples'],
-            'treatment': 'Can be managed with skincare, topical medicines, or dermatologist advice.',
+            'symptoms': ['Whiteheads', 'Blackheads', 'Pimples', 'Cysts'],
+            'treatment': 'Over-the-counter creams, proper hygiene, or dermatologist-prescribed medication.',
             'prevention': 'Keep skin clean and avoid irritating products.'
         },
         'Normal': {
@@ -98,6 +105,139 @@ def get_disease_info(disease_name):
             'symptoms': ['Clear skin', 'Even texture'],
             'treatment': 'No treatment needed.',
             'prevention': 'Maintain a healthy skincare routine.'
+        },
+        'Benign_tumors': {
+            'severity': 'Low',
+            'description': 'Non-cancerous growths on the skin.',
+            'symptoms': ['Painless lump', 'Slow-growing mass'],
+            'treatment': 'Often no treatment needed unless bothersome; can be surgically removed.',
+            'prevention': 'Generally cannot be prevented; monitor for rapid changes.'
+        },
+        'Eczema': {
+            'severity': 'Low to Medium',
+            'description': 'A condition that makes your skin red and itchy.',
+            'symptoms': ['Dry skin', 'Itching', 'Red to brownish-gray patches'],
+            'treatment': 'Moisturizers, topical corticosteroids, and avoiding triggers.',
+            'prevention': 'Moisturize regularly, wear soft fabrics, avoid harsh soaps.'
+        },
+        'Tinea': {
+            'severity': 'Low to Medium',
+            'description': 'A highly contagious fungal infection of the skin (like Ringworm).',
+            'symptoms': ['Ring-shaped red rash', 'Itching', 'Scaly skin'],
+            'treatment': 'Antifungal creams or oral medication.',
+            'prevention': 'Keep skin clean and dry, do not share personal items.'
+        },
+        'Psoriasis': {
+            'severity': 'Medium',
+            'description': 'A skin disease that causes red, itchy scaly patches.',
+            'symptoms': ['Red patches of skin covered with thick, silvery scales', 'Dry, cracked skin'],
+            'treatment': 'Topical treatments, light therapy, and systemic medications.',
+            'prevention': 'Manage stress, avoid smoking, and moisturize daily.'
+        },
+        'Actinic_Keratosis': {
+            'severity': 'Medium',
+            'description': 'A rough, scaly patch on the skin that develops from years of sun exposure (Precancerous).',
+            'symptoms': ['Rough, scaly patch', 'Itching or burning', 'Varies in color (pink, red, or brown)'],
+            'treatment': 'Cryotherapy, topical creams, or laser therapy to remove it.',
+            'prevention': 'Strict sun protection to prevent progression to cancer.'
+        },
+        'Vitiligo': {
+            'severity': 'Low',
+            'description': 'A disease that causes loss of skin color in patches.',
+            'symptoms': ['Patchy loss of skin color', 'Premature whitening of hair'],
+            'treatment': 'Light therapy, topical corticosteroids, or depigmentation.',
+            'prevention': 'Cannot be prevented, but sun protection helps protect the lighter skin.'
+        },
+        'Warts': {
+            'severity': 'Low',
+            'description': 'Small, fleshy bumps on the skin or mucous membranes caused by HPV.',
+            'symptoms': ['Small, fleshy, grainy bumps', 'Flesh-colored, white, pink or tan'],
+            'treatment': 'Salicylic acid, freezing (cryotherapy), or minor surgery.',
+            'prevention': 'Avoid direct contact with warts, do not share personal items.'
+        },
+        'Lichen': {
+            'severity': 'Low to Medium',
+            'description': 'An inflammatory skin condition triggered by the immune system.',
+            'symptoms': ['Purplish, itchy, flat-topped bumps', 'Lacy white patches'],
+            'treatment': 'Corticosteroid creams, antihistamines, or light therapy.',
+            'prevention': 'Exact cause is unknown; manage stress.'
+        },
+        'DrugEruption': {
+            'severity': 'Medium',
+            'description': 'An adverse skin reaction to a drug or medication.',
+            'symptoms': ['Red rash', 'Hives', 'Itching', 'Skin blistering in severe cases'],
+            'treatment': 'Stop the offending drug immediately and consult a doctor. Antihistamines.',
+            'prevention': 'Avoid medications you are allergic to.'
+        },
+        'Vascular_Tumors': {
+            'severity': 'Low',
+            'description': 'Abnormal overgrowth of blood vessels (e.g., hemangiomas).',
+            'symptoms': ['Red or purplish lump', 'May bleed easily if scratched'],
+            'treatment': 'Often left alone if small; laser therapy or surgical removal if problematic.',
+            'prevention': 'Generally cannot be prevented.'
+        },
+        'Infestations_Bites': {
+            'severity': 'Low',
+            'description': 'Skin irritation caused by insects, mites, or ticks.',
+            'symptoms': ['Redness', 'Swelling', 'Itching', 'Puncture marks'],
+            'treatment': 'Wash area, apply anti-itch cream or antihistamines.',
+            'prevention': 'Use insect repellent, wear protective clothing outdoors.'
+        },
+        'Bullous': {
+            'severity': 'Medium to High',
+            'description': 'A group of rare diseases that cause fluid-filled blisters on the skin.',
+            'symptoms': ['Large, fluid-filled blisters', 'Itchy, red skin'],
+            'treatment': 'Corticosteroids, immunosuppressants. Consult a dermatologist.',
+            'prevention': 'Cannot be prevented; avoiding trauma to the skin helps.'
+        },
+        'Vasculitis': {
+            'severity': 'Medium to High',
+            'description': 'Inflammation of the blood vessels causing changes in the skin.',
+            'symptoms': ['Purple or red spots (petechiae)', 'Skin ulcers', 'Painful nodules'],
+            'treatment': 'Corticosteroids to reduce inflammation. Requires medical attention.',
+            'prevention': 'Prompt treatment of underlying infections or autoimmune conditions.'
+        },
+        'Seborrh_Keratoses': {
+            'severity': 'Low',
+            'description': 'A common noncancerous skin growth that often appears as you age.',
+            'symptoms': ['Waxy, scaly, slightly elevated appearance', 'Brown, black, or light tan'],
+            'treatment': 'Usually requires no treatment; can be frozen or scraped off if irritated.',
+            'prevention': 'Cannot be entirely prevented; part of natural aging.'
+        },
+        'Moles': {
+            'severity': 'Low',
+            'description': 'Common skin growths caused by clusters of pigmented cells.',
+            'symptoms': ['Brown, black or skin-colored spots', 'Usually round or oval'],
+            'treatment': 'Usually none needed unless they change in size, shape, or color.',
+            'prevention': 'Monitor for changes that could indicate melanoma.'
+        },
+        'Sun_Sunlight_Damage': {
+            'severity': 'Low to Medium',
+            'description': 'Skin damage caused by chronic exposure to UV rays.',
+            'symptoms': ['Wrinkles', 'Sunspots', 'Uneven pigmentation', 'Leathery skin'],
+            'treatment': 'Topical retinoids, laser therapy, chemical peels.',
+            'prevention': 'Use sunscreen daily, wear hats, and avoid peak sun hours.'
+        },
+        'Lupus': {
+            'severity': 'High',
+            'description': 'An autoimmune disease that can cause skin rashes, especially a butterfly rash.',
+            'symptoms': ['Butterfly-shaped rash on the face', 'Sensitivity to sunlight', 'Red, scaly patches'],
+            'treatment': 'Immunosuppressants, antimalarial drugs, and strict sun protection.',
+            'prevention': 'Cannot be prevented; avoid UV light to prevent flare-ups.'
+        },
+        'Rosacea': {
+            'severity': 'Low',
+            'description': 'A common skin condition that causes redness and visible blood vessels in your face.',
+            'symptoms': ['Facial redness', 'Swollen red bumps', 'Eye problems'],
+            'treatment': 'Topical drugs that reduce redness, oral antibiotics, laser therapy.',
+            'prevention': 'Avoid triggers like spicy foods, hot drinks, and extreme temperatures.'
+        },
+        'Candidiasis': {
+            'severity': 'Low to Medium',
+            'description': 'A fungal infection caused by a yeast (a type of fungus) called Candida.',
+            'symptoms': ['Red rash', 'Itching', 'Small blisters or pustules'],
+            'treatment': 'Antifungal creams, ointments, or oral medications.',
+            'prevention': 'Keep skin dry and clean, wear breathable clothing.'
         }
     }
 
@@ -173,7 +313,7 @@ def predict():
         predicted_class = str(class_labels[predicted_index])
         confidence = float(predictions[0][predicted_index]) * 100.0
 
-        top_indices = np.argsort(predictions[0])[::-1][:7]
+        top_indices = np.argsort(predictions[0])[::-1][:8]
         top_predictions = [
             {
                 'class': str(class_labels[int(idx)]),

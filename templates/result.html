@@ -49,7 +49,7 @@
                         <div class="confidence-bar mt-3">
                             <div class="confidence-fill" style="width: {{ result.confidence }}%"></div>
                         </div>
-                        
+
                         {% set severity = result.disease_info.severity %}
                         <div class="severity-badge severity-{{ severity.lower() }} mt-3">
                             <i class="fas fa-exclamation-triangle me-2"></i>
@@ -71,7 +71,7 @@
 
                 <div class="result-card chart-card">
                     <h5 class="card-title mb-4">
-                        <i class="fas fa-chart-pie me-2"></i>Top 7 Predictions
+                        <i class="fas fa-chart-pie me-2"></i>Top 8 Predictions
                     </h5>
                     <div style="height: 320px; position: relative;">
                         <canvas id="chartPie"></canvas>
@@ -128,7 +128,9 @@
                     </div>
                     <div class="disclaimer-content">
                         <h6>Medical Disclaimer</h6>
-                        <p>This AI-based diagnosis is for informational purposes only and should not replace professional medical advice. Please consult a qualified dermatologist or healthcare provider for proper diagnosis and treatment.</p>
+                        <p>This AI-based diagnosis is for informational purposes only and should not replace
+                            professional medical advice. Please consult a qualified dermatologist or healthcare provider
+                            for proper diagnosis and treatment.</p>
                     </div>
                 </div>
             </div>
@@ -152,133 +154,139 @@
 {% block extra_js %}
 {% if result %}
 <script>
-var chartData = {{ result.top_predictions | tojson | safe }};
-var chartLabels = [];
-var chartValues = [];
+    var chartData = {{ result.top_predictions | tojson | safe }};
+    var chartLabels = [];
+    var chartValues = [];
 
-for (var i = 0; i < chartData.length; i++) {
-    chartLabels.push(chartData[i].class);
-    chartValues.push(chartData[i].probability);
-}
+    for (var i = 0; i < chartData.length; i++) {
+        chartLabels.push(chartData[i].class);
+        chartValues.push(chartData[i].probability);
+    }
 
-var chartColors = [
-    'rgba(102, 126, 234, 0.8)',
-    'rgba(118, 75, 162, 0.8)',
-    'rgba(237, 100, 166, 0.8)',
-    'rgba(255, 154, 158, 0.8)',
-    'rgba(250, 208, 196, 0.8)'
-];
+    var chartColors = [
+        'rgba(102, 126, 234, 0.8)',
+        'rgba(118, 75, 162, 0.8)',
+        'rgba(237, 100, 166, 0.8)',
+        'rgba(255, 154, 158, 0.8)',
+        'rgba(250, 208, 196, 0.8)',
+        'rgba(67, 233, 123, 0.8)',
+        'rgba(56, 249, 215, 0.8)',
+        'rgba(255, 195, 113, 0.8)'
+    ];
 
-var chartBorders = [
-    'rgb(102, 126, 234)',
-    'rgb(118, 75, 162)',
-    'rgb(237, 100, 166)',
-    'rgb(255, 154, 158)',
-    'rgb(250, 208, 196)'
-];
+    var chartBorders = [
+        'rgb(102, 126, 234)',
+        'rgb(118, 75, 162)',
+        'rgb(237, 100, 166)',
+        'rgb(255, 154, 158)',
+        'rgb(250, 208, 196)',
+        'rgb(67, 233, 123)',
+        'rgb(56, 249, 215)',
+        'rgb(255, 195, 113)'
+    ];
 
-window.addEventListener('load', function() {
-    setTimeout(function() {
-        var ctx1 = document.getElementById('chartBar');
-        var ctx2 = document.getElementById('chartPie');
-        
-        if (ctx1 && typeof Chart !== 'undefined') {
-            new Chart(ctx1.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'Confidence',
-                        data: chartValues,
-                        backgroundColor: chartColors,
-                        borderColor: chartBorders,
-                        borderWidth: 2,
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Confidence: ' + context.parsed.y.toFixed(2) + '%';
-                                }
-                            }
-                        }
+    window.addEventListener('load', function () {
+        setTimeout(function () {
+            var ctx1 = document.getElementById('chartBar');
+            var ctx2 = document.getElementById('chartPie');
+
+            if (ctx1 && typeof Chart !== 'undefined') {
+                new Chart(ctx1.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Confidence',
+                            data: chartValues,
+                            backgroundColor: chartColors,
+                            borderColor: chartBorders,
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                color: '#94a3b8',
-                                callback: function(value) {
-                                    return value + '%';
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                padding: 12,
+                                callbacks: {
+                                    label: function (context) {
+                                        return 'Confidence: ' + context.parsed.y.toFixed(2) + '%';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    color: '#94a3b8',
+                                    callback: function (value) {
+                                        return value + '%';
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(148, 163, 184, 0.1)'
                                 }
                             },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#94a3b8',
-                                maxRotation: 45,
-                                minRotation: 45
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        if (ctx2 && typeof Chart !== 'undefined') {
-            new Chart(ctx2.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        data: chartValues,
-                        backgroundColor: chartColors,
-                        borderColor: '#0f172a',
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                color: '#94a3b8',
-                                padding: 15,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed.toFixed(2) + '%';
+                            x: {
+                                ticks: {
+                                    color: '#94a3b8',
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                },
+                                grid: {
+                                    display: false
                                 }
                             }
                         }
                     }
-                }
-            });
-        }
-    }, 500);
-});
+                });
+            }
+
+            if (ctx2 && typeof Chart !== 'undefined') {
+                new Chart(ctx2.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartValues,
+                            backgroundColor: chartColors,
+                            borderColor: '#0f172a',
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: '#94a3b8',
+                                    padding: 15,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                padding: 12,
+                                callbacks: {
+                                    label: function (context) {
+                                        return context.label + ': ' + context.parsed.toFixed(2) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }, 500);
+    });
 </script>
 {% endif %}
 {% endblock %}
