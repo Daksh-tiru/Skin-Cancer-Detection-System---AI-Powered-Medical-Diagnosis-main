@@ -8,7 +8,7 @@ from datetime import datetime
 import secrets
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
+app.secret_key = 'skincare_ai_super_secret_production_key_123'
 
 # ---------------- CONFIG ---------------- #
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
