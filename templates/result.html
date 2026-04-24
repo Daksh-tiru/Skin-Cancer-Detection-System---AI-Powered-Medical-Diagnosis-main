@@ -3,290 +3,291 @@
 {% block content %}
 <section class="result-section">
     <div class="container">
-        {% if no_result %}
-        <div class="row justify-content-center">
+
+        <!-- No Result State (shown by default, hidden by JS when data exists) -->
+        <div id="noResultSection" class="row justify-content-center" style="display:none;">
             <div class="col-lg-6 text-center">
                 <div class="no-result-card" data-aos="fade-up">
                     <i class="fas fa-exclamation-circle"></i>
                     <h3>No Results Available</h3>
                     <p>Please upload an image first to get prediction results</p>
-                    <a href="{{ url_for('prediction') }}" class="btn btn-primary mt-3">
+                    <a href="/prediction" class="btn btn-primary mt-3">
                         <i class="fas fa-upload me-2"></i>Upload Image
                     </a>
                 </div>
             </div>
         </div>
-        {% else %}
-        <div class="result-header text-center mb-5" data-aos="fade-down">
-            <span class="badge badge-success mb-3">
-                <i class="fas fa-check-circle me-2"></i>Analysis Complete
-            </span>
-            <h1 class="page-title">Diagnosis Results</h1>
-            <p class="text-muted">{{ result.timestamp }}</p>
-        </div>
 
-        <div class="row g-4">
-            <div class="col-lg-5" data-aos="fade-right">
-                <div class="result-card image-card">
-                    <h5 class="card-title mb-3">
-                        <i class="fas fa-image me-2"></i>Uploaded Image
-                    </h5>
-                    <div class="uploaded-image">
-                        <img src="{{ result.image_path }}" alt="Uploaded skin image">
+        <!-- Result Content (hidden until JS populates it) -->
+        <div id="resultSection" style="display:none;">
+            <div class="result-header text-center mb-5" data-aos="fade-down">
+                <span class="badge badge-success mb-3">
+                    <i class="fas fa-check-circle me-2"></i>Analysis Complete
+                </span>
+                <h1 class="page-title">Diagnosis Results</h1>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-5" data-aos="fade-right">
+                    <div class="result-card image-card">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-image me-2"></i>Uploaded Image
+                        </h5>
+                        <div class="uploaded-image">
+                            <img id="resultImage" src="" alt="Uploaded skin image">
+                        </div>
+                    </div>
+
+                    <div class="result-card prediction-card mt-4">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-diagnoses me-2"></i>Primary Diagnosis
+                        </h5>
+                        <div class="prediction-result">
+                            <div class="disease-name" id="diseaseName"></div>
+                            <div class="confidence-badge">
+                                <span class="confidence-label">Confidence:</span>
+                                <span class="confidence-value" id="confidenceValue"></span>
+                            </div>
+                            <div class="confidence-bar mt-3">
+                                <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                            </div>
+                            <div class="severity-badge mt-3" id="severityBadge">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Severity: <span id="severityText"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="result-card prediction-card mt-4">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-diagnoses me-2"></i>Primary Diagnosis
-                    </h5>
-                    <div class="prediction-result">
-                        <div class="disease-name">{{ result.predicted_class }}</div>
-                        <div class="confidence-badge">
-                            <span class="confidence-label">Confidence:</span>
-                            <span class="confidence-value">{{ "%.2f"|format(result.confidence) }}%</span>
+                <div class="col-lg-7" data-aos="fade-left">
+                    <div class="result-card chart-card mb-4">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-chart-bar me-2"></i>Probability Distribution
+                        </h5>
+                        <div style="height: 320px; position: relative;">
+                            <canvas id="chartBar"></canvas>
                         </div>
-                        <div class="confidence-bar mt-3">
-                            <div class="confidence-fill" style="width: {{ result.confidence }}%"></div>
-                        </div>
+                    </div>
 
-                        {% set severity = result.disease_info.severity %}
-                        <div class="severity-badge severity-{{ severity.lower() }} mt-3">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Severity: {{ severity }}
+                    <div class="result-card chart-card">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-chart-pie me-2"></i>Top 8 Predictions
+                        </h5>
+                        <div style="height: 320px; position: relative;">
+                            <canvas id="chartPie"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-7" data-aos="fade-left">
-                <div class="result-card chart-card mb-4">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-chart-bar me-2"></i>Probability Distribution
-                    </h5>
-                    <div style="height: 320px; position: relative;">
-                        <canvas id="chartBar"></canvas>
-                    </div>
-                </div>
-
-                <div class="result-card chart-card">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-chart-pie me-2"></i>Top 8 Predictions
-                    </h5>
-                    <div style="height: 320px; position: relative;">
-                        <canvas id="chartPie"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-12" data-aos="fade-up">
-                <div class="result-card info-card">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-info-circle me-2"></i>Disease Information
-                    </h5>
-                    <div class="row">
-                        <div class="col-lg-6 mb-4">
-                            <h6 class="info-heading">
-                                <i class="fas fa-file-medical me-2 text-primary"></i>Description
-                            </h6>
-                            <p class="info-text">{{ result.disease_info.description }}</p>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <h6 class="info-heading">
-                                <i class="fas fa-stethoscope me-2 text-danger"></i>Common Symptoms
-                            </h6>
-                            <ul class="symptoms-list">
-                                {% for symptom in result.disease_info.symptoms %}
-                                <li>{{ symptom }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <h6 class="info-heading">
-                                <i class="fas fa-pills me-2 text-success"></i>Treatment Options
-                            </h6>
-                            <p class="info-text">{{ result.disease_info.treatment }}</p>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <h6 class="info-heading">
-                                <i class="fas fa-shield-alt me-2 text-warning"></i>Prevention
-                            </h6>
-                            <p class="info-text">{{ result.disease_info.prevention }}</p>
+            <div class="row mt-4">
+                <div class="col-12" data-aos="fade-up">
+                    <div class="result-card info-card">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-info-circle me-2"></i>Disease Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-lg-6 mb-4">
+                                <h6 class="info-heading">
+                                    <i class="fas fa-file-medical me-2 text-primary"></i>Description
+                                </h6>
+                                <p class="info-text" id="diseaseDescription"></p>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <h6 class="info-heading">
+                                    <i class="fas fa-stethoscope me-2 text-danger"></i>Common Symptoms
+                                </h6>
+                                <ul class="symptoms-list" id="symptomsList"></ul>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <h6 class="info-heading">
+                                    <i class="fas fa-pills me-2 text-success"></i>Treatment Options
+                                </h6>
+                                <p class="info-text" id="treatmentText"></p>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <h6 class="info-heading">
+                                    <i class="fas fa-shield-alt me-2 text-warning"></i>Prevention
+                                </h6>
+                                <p class="info-text" id="preventionText"></p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mt-4">
-            <div class="col-12" data-aos="fade-up">
-                <div class="disclaimer-card">
-                    <div class="disclaimer-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
+            <div class="row mt-4">
+                <div class="col-12" data-aos="fade-up">
+                    <div class="disclaimer-card">
+                        <div class="disclaimer-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="disclaimer-content">
+                            <h6>Medical Disclaimer</h6>
+                            <p>This AI-based diagnosis is for informational purposes only and should not replace
+                                professional medical advice. Please consult a qualified dermatologist or healthcare provider
+                                for proper diagnosis and treatment.</p>
+                        </div>
                     </div>
-                    <div class="disclaimer-content">
-                        <h6>Medical Disclaimer</h6>
-                        <p>This AI-based diagnosis is for informational purposes only and should not replace
-                            professional medical advice. Please consult a qualified dermatologist or healthcare provider
-                            for proper diagnosis and treatment.</p>
-                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4 mb-5">
+                <div class="col-12 text-center" data-aos="fade-up">
+                    <a href="/prediction" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-redo me-2"></i>Analyze Another Image
+                    </a>
+                    <button class="btn btn-outline-primary btn-lg" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Print Results
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="row mt-4 mb-5">
-            <div class="col-12 text-center" data-aos="fade-up">
-                <a href="{{ url_for('prediction') }}" class="btn btn-primary btn-lg me-3">
-                    <i class="fas fa-redo me-2"></i>Analyze Another Image
-                </a>
-                <button class="btn btn-outline-primary btn-lg" onclick="window.print()">
-                    <i class="fas fa-print me-2"></i>Print Results
-                </button>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
-{% if result %}
 <script>
-    var chartData = {{ result.top_predictions | tojson | safe }};
-    var chartLabels = [];
-    var chartValues = [];
-
-    for (var i = 0; i < chartData.length; i++) {
-        chartLabels.push(chartData[i].class);
-        chartValues.push(chartData[i].probability);
-    }
-
     var chartColors = [
-        'rgba(102, 126, 234, 0.8)',
-        'rgba(118, 75, 162, 0.8)',
-        'rgba(237, 100, 166, 0.8)',
-        'rgba(255, 154, 158, 0.8)',
-        'rgba(250, 208, 196, 0.8)',
-        'rgba(67, 233, 123, 0.8)',
-        'rgba(56, 249, 215, 0.8)',
-        'rgba(255, 195, 113, 0.8)'
+        'rgba(102, 126, 234, 0.8)', 'rgba(118, 75, 162, 0.8)', 'rgba(237, 100, 166, 0.8)',
+        'rgba(255, 154, 158, 0.8)', 'rgba(250, 208, 196, 0.8)', 'rgba(67, 233, 123, 0.8)',
+        'rgba(56, 249, 215, 0.8)', 'rgba(255, 195, 113, 0.8)'
     ];
-
     var chartBorders = [
-        'rgb(102, 126, 234)',
-        'rgb(118, 75, 162)',
-        'rgb(237, 100, 166)',
-        'rgb(255, 154, 158)',
-        'rgb(250, 208, 196)',
-        'rgb(67, 233, 123)',
-        'rgb(56, 249, 215)',
-        'rgb(255, 195, 113)'
+        'rgb(102, 126, 234)', 'rgb(118, 75, 162)', 'rgb(237, 100, 166)',
+        'rgb(255, 154, 158)', 'rgb(250, 208, 196)', 'rgb(67, 233, 123)',
+        'rgb(56, 249, 215)', 'rgb(255, 195, 113)'
     ];
 
     window.addEventListener('load', function () {
-        setTimeout(function () {
-            var ctx1 = document.getElementById('chartBar');
-            var ctx2 = document.getElementById('chartPie');
+        var raw = localStorage.getItem('skincare_result');
 
-            if (ctx1 && typeof Chart !== 'undefined') {
-                new Chart(ctx1.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Confidence',
-                            data: chartValues,
-                            backgroundColor: chartColors,
-                            borderColor: chartBorders,
-                            borderWidth: 2,
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                                padding: 12,
-                                callbacks: {
-                                    label: function (context) {
-                                        return 'Confidence: ' + context.parsed.y.toFixed(2) + '%';
-                                    }
-                                }
-                            }
+        if (!raw) {
+            document.getElementById('noResultSection').style.display = 'flex';
+            return;
+        }
+
+        try {
+            var result = JSON.parse(raw);
+
+            // Populate all fields
+            document.getElementById('resultImage').src = result.image_path;
+            document.getElementById('diseaseName').textContent = result.predicted_class;
+            document.getElementById('confidenceValue').textContent = result.confidence.toFixed(2) + '%';
+            document.getElementById('confidenceFill').style.width = result.confidence + '%';
+
+            var severity = result.disease_info.severity || 'Unknown';
+            var severityBadge = document.getElementById('severityBadge');
+            severityBadge.className = 'severity-badge severity-' + severity.toLowerCase() + ' mt-3';
+            document.getElementById('severityText').textContent = severity;
+
+            document.getElementById('diseaseDescription').textContent = result.disease_info.description;
+            document.getElementById('treatmentText').textContent = result.disease_info.treatment;
+            document.getElementById('preventionText').textContent = result.disease_info.prevention;
+
+            var symptomsList = document.getElementById('symptomsList');
+            symptomsList.innerHTML = '';
+            (result.disease_info.symptoms || []).forEach(function(s) {
+                var li = document.createElement('li');
+                li.textContent = s;
+                symptomsList.appendChild(li);
+            });
+
+            // Build charts
+            var chartLabels = result.top_predictions.map(function(p) { return p.class; });
+            var chartValues = result.top_predictions.map(function(p) { return p.probability; });
+
+            setTimeout(function () {
+                var ctx1 = document.getElementById('chartBar');
+                var ctx2 = document.getElementById('chartPie');
+
+                if (ctx1 && typeof Chart !== 'undefined') {
+                    new Chart(ctx1.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                label: 'Confidence',
+                                data: chartValues,
+                                backgroundColor: chartColors,
+                                borderColor: chartBorders,
+                                borderWidth: 2,
+                                borderRadius: 8
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                                ticks: {
-                                    color: '#94a3b8',
-                                    callback: function (value) {
-                                        return value + '%';
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0,0,0,0.9)',
+                                    padding: 12,
+                                    callbacks: {
+                                        label: function(c) { return 'Confidence: ' + c.parsed.y.toFixed(2) + '%'; }
                                     }
-                                },
-                                grid: {
-                                    color: 'rgba(148, 163, 184, 0.1)'
                                 }
                             },
-                            x: {
-                                ticks: {
-                                    color: '#94a3b8',
-                                    maxRotation: 45,
-                                    minRotation: 45
+                            scales: {
+                                y: {
+                                    beginAtZero: true, max: 100,
+                                    ticks: { color: '#94a3b8', callback: function(v) { return v + '%'; } },
+                                    grid: { color: 'rgba(148,163,184,0.1)' }
                                 },
-                                grid: {
-                                    display: false
+                                x: {
+                                    ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 45 },
+                                    grid: { display: false }
                                 }
                             }
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-            if (ctx2 && typeof Chart !== 'undefined') {
-                new Chart(ctx2.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            data: chartValues,
-                            backgroundColor: chartColors,
-                            borderColor: '#0f172a',
-                            borderWidth: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    color: '#94a3b8',
-                                    padding: 15,
-                                    usePointStyle: true
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                                padding: 12,
-                                callbacks: {
-                                    label: function (context) {
-                                        return context.label + ': ' + context.parsed.toFixed(2) + '%';
+                if (ctx2 && typeof Chart !== 'undefined') {
+                    new Chart(ctx2.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                data: chartValues,
+                                backgroundColor: chartColors,
+                                borderColor: '#0f172a',
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: { color: '#94a3b8', padding: 15, usePointStyle: true }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0,0,0,0.9)',
+                                    padding: 12,
+                                    callbacks: {
+                                        label: function(c) { return c.label + ': ' + c.parsed.toFixed(2) + '%'; }
                                     }
                                 }
                             }
                         }
-                    }
-                });
-            }
-        }, 500);
+                    });
+                }
+            }, 500);
+
+            // Show result, hide no-result
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('noResultSection').style.display = 'none';
+
+            // Clear from localStorage after reading
+            localStorage.removeItem('skincare_result');
+
+        } catch (e) {
+            document.getElementById('noResultSection').style.display = 'flex';
+        }
     });
 </script>
-{% endif %}
 {% endblock %}

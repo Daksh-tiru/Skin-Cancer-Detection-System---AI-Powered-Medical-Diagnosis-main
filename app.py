@@ -324,7 +324,7 @@ def predict():
 
         disease_info = get_disease_info(predicted_class)
 
-        session['prediction_result'] = {
+        result_data = {
             'predicted_class': predicted_class,
             'confidence': confidence,
             'image_path': url_for('static', filename=f'uploads/{unique_filename}'),
@@ -346,6 +346,7 @@ def predict():
 
         return jsonify({
             'success': True,
+            'result': result_data,
             'redirect': url_for('result')
         })
 
@@ -356,25 +357,8 @@ def predict():
 
 @app.route('/result')
 def result():
-    prediction_result = session.get('prediction_result')
-
-    if not prediction_result:
-        return render_template('result.html', no_result=True)
-
-    # Safety defaults so template never crashes
-    prediction_result.setdefault('predicted_class', 'Unknown')
-    prediction_result.setdefault('confidence', 0.0)
-    prediction_result.setdefault('image_path', '')
-    prediction_result.setdefault('top_predictions', [])
-    prediction_result.setdefault('disease_info', {
-        'severity': 'Unknown',
-        'description': 'No description available.',
-        'symptoms': [],
-        'treatment': 'Consult a medical professional.',
-        'prevention': 'Regular monitoring recommended.'
-    })
-
-    return render_template('result.html', result=prediction_result)
+    # Result data is passed via localStorage from the frontend
+    return render_template('result.html')
 
 
 @app.route('/contact-submit', methods=['POST'])

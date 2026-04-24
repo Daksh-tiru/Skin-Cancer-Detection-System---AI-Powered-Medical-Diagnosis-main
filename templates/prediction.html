@@ -196,6 +196,8 @@
             const data = await response.json();
 
             if (data.success) {
+                // Store result in localStorage to avoid session issues on cloud servers
+                localStorage.setItem('skincare_result', JSON.stringify(data.result));
                 window.location.href = data.redirect;
             } else {
                 showError(data.error || 'Prediction failed');
