@@ -1,3 +1,12 @@
+---
+title: SkinCare AI
+emoji: 🩺
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # 🔬 Skin Cancer Detection System - AI-Powered Medical Diagnosis
 
 Advanced deep learning system for detecting and classifying **24 types of skin diseases** using Convolutional Neural Networks (CNN). This web application provides real-time skin condition analysis with high accuracy, featuring an intuitive interface and comprehensive disease information.
