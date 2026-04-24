@@ -1,5 +1,6 @@
 # Dataset and Model Files (Large files - download separately)
 dataset/
+dataset.zip
 models/*.keras
 models/*.h5
 models/*.pb

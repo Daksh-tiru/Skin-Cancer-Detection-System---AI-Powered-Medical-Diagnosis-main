@@ -79,14 +79,14 @@ def get_disease_info(disease_name):
             'prevention': 'Use sunscreen, avoid UV exposure, and do regular skin checks.'
         },
         'basal_cell_carcinoma': {
-            'severity': 'Medium',
+            'severity': 'Low to Medium',
             'description': 'A common and usually treatable type of skin cancer.',
             'symptoms': ['Pearly bump', 'Flat flesh-colored lesion', 'Bleeding sore that heals and returns'],
             'treatment': 'Minor surgical or dermatological procedures.',
             'prevention': 'Sun protection and regular skin monitoring.'
         },
         'squamous_cell_carcinoma': {
-            'severity': 'Medium to High',
+            'severity': 'High',
             'description': 'A common form of skin cancer that develops in the squamous cells.',
             'symptoms': ['Firm, red nodule', 'Flat sore with a scaly crust'],
             'treatment': 'Surgical excision, Mohs surgery, or radiation therapy. Consult a doctor.',
@@ -114,21 +114,21 @@ def get_disease_info(disease_name):
             'prevention': 'Generally cannot be prevented; monitor for rapid changes.'
         },
         'Eczema': {
-            'severity': 'Low to Medium',
+            'severity': 'Low',
             'description': 'A condition that makes your skin red and itchy.',
             'symptoms': ['Dry skin', 'Itching', 'Red to brownish-gray patches'],
             'treatment': 'Moisturizers, topical corticosteroids, and avoiding triggers.',
             'prevention': 'Moisturize regularly, wear soft fabrics, avoid harsh soaps.'
         },
         'Tinea': {
-            'severity': 'Low to Medium',
+            'severity': 'Low',
             'description': 'A highly contagious fungal infection of the skin (like Ringworm).',
             'symptoms': ['Ring-shaped red rash', 'Itching', 'Scaly skin'],
             'treatment': 'Antifungal creams or oral medication.',
             'prevention': 'Keep skin clean and dry, do not share personal items.'
         },
         'Psoriasis': {
-            'severity': 'Medium',
+            'severity': 'Low to Medium',
             'description': 'A skin disease that causes red, itchy scaly patches.',
             'symptoms': ['Red patches of skin covered with thick, silvery scales', 'Dry, cracked skin'],
             'treatment': 'Topical treatments, light therapy, and systemic medications.',
@@ -156,14 +156,14 @@ def get_disease_info(disease_name):
             'prevention': 'Avoid direct contact with warts, do not share personal items.'
         },
         'Lichen': {
-            'severity': 'Low to Medium',
+            'severity': 'Low',
             'description': 'An inflammatory skin condition triggered by the immune system.',
             'symptoms': ['Purplish, itchy, flat-topped bumps', 'Lacy white patches'],
             'treatment': 'Corticosteroid creams, antihistamines, or light therapy.',
             'prevention': 'Exact cause is unknown; manage stress.'
         },
         'DrugEruption': {
-            'severity': 'Medium',
+            'severity': 'High',
             'description': 'An adverse skin reaction to a drug or medication.',
             'symptoms': ['Red rash', 'Hives', 'Itching', 'Skin blistering in severe cases'],
             'treatment': 'Stop the offending drug immediately and consult a doctor. Antihistamines.',
@@ -184,14 +184,14 @@ def get_disease_info(disease_name):
             'prevention': 'Use insect repellent, wear protective clothing outdoors.'
         },
         'Bullous': {
-            'severity': 'Medium to High',
+            'severity': 'High',
             'description': 'A group of rare diseases that cause fluid-filled blisters on the skin.',
             'symptoms': ['Large, fluid-filled blisters', 'Itchy, red skin'],
             'treatment': 'Corticosteroids, immunosuppressants. Consult a dermatologist.',
             'prevention': 'Cannot be prevented; avoiding trauma to the skin helps.'
         },
         'Vasculitis': {
-            'severity': 'Medium to High',
+            'severity': 'High',
             'description': 'Inflammation of the blood vessels causing changes in the skin.',
             'symptoms': ['Purple or red spots (petechiae)', 'Skin ulcers', 'Painful nodules'],
             'treatment': 'Corticosteroids to reduce inflammation. Requires medical attention.',
@@ -212,7 +212,7 @@ def get_disease_info(disease_name):
             'prevention': 'Monitor for changes that could indicate melanoma.'
         },
         'Sun_Sunlight_Damage': {
-            'severity': 'Low to Medium',
+            'severity': 'Low',
             'description': 'Skin damage caused by chronic exposure to UV rays.',
             'symptoms': ['Wrinkles', 'Sunspots', 'Uneven pigmentation', 'Leathery skin'],
             'treatment': 'Topical retinoids, laser therapy, chemical peels.',
@@ -233,7 +233,7 @@ def get_disease_info(disease_name):
             'prevention': 'Avoid triggers like spicy foods, hot drinks, and extreme temperatures.'
         },
         'Candidiasis': {
-            'severity': 'Low to Medium',
+            'severity': 'Low',
             'description': 'A fungal infection caused by a yeast (a type of fungus) called Candida.',
             'symptoms': ['Red rash', 'Itching', 'Small blisters or pustules'],
             'treatment': 'Antifungal creams, ointments, or oral medications.',
